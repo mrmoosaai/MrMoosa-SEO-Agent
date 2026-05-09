@@ -15,6 +15,12 @@ spec = importlib.util.spec_from_file_location("seo_core", module_path)
 if spec is None or spec.loader is None:
     raise ImportError(f"Cannot load seo_core module from path: {module_path}")
 
+# Ensure the seo_core script folder is on the import path so internal imports like
+# `from ai_insights import AIInsights` work correctly.
+script_dir = os.path.dirname(module_path)
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
 seo_core = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(seo_core)
 
