@@ -1,0 +1,76 @@
+{
+  "user_profile": {
+    "brand_name": "Mr Moosa AI",
+    "target_audience": ["Etsy sellers", "content creators", "beginners"],
+    "niche": ["free tools", "automation", "SEO", "AI"],
+    "platforms": ["Pinterest", "Facebook", "Shopify", "Instagram", "YouTube", "Etsy", "TikTok"]
+  },
+  
+  "platform_rules": {
+    "pinterest": {
+      "focus": ["Rich Pins", "Board SEO", "Pin descriptions", "Alt text"],
+      "max_title_len": 100,
+      "max_desc_len": 500,
+      "keywords_location": ["board names", "pin descriptions", "profile about"],
+      "best_practices": ["Use vertical images (2:3 ratio)", "Add price to pins", "Enable rich pins"]
+    },
+    "facebook": {
+      "focus": ["Page info", "About section", "Post engagement", "Shop setup"],
+      "max_title_len": 75,
+      "max_desc_len": 255,
+      "keywords_location": ["page name", "about", "services", "posts"],
+      "best_practices": ["Complete page 100%", "Add CTA button", "Enable Facebook Shop", "Post 3-5x/week"]
+    },
+    "shopify": {
+      "focus": ["Product titles", "Meta descriptions", "Collection pages", "Schema markup"],
+      "max_title_len": 60,
+      "max_desc_len": 160,
+      "keywords_location": ["product titles", "descriptions", "collection names", "blog posts"],
+      "best_practices": ["Use SEO-friendly URLs", "Add alt text to product images", "Enable reviews", "Optimize site speed"]
+    },
+    "instagram": {
+      "focus": ["Bio optimization", "Hashtags", "Reels", "Stories highlights"],
+      "max_title_len": 30,
+      "max_desc_len": 150,
+      "keywords_location": ["bio", "captions", "hashtags", "highlights"],
+      "best_practices": ["Use 30 hashtags strategically", "Add link in bio", "Post Reels daily", "Use branded hashtag"]
+    },
+    "youtube": {
+      "focus": ["Video titles", "Descriptions", "Tags", "Thumbnails", "Playlists"],
+      "max_title_len": 60,
+      "max_desc_len": 5000,
+      "keywords_location": ["video titles", "descriptions", "tags", "playlist names"],
+      "best_practices": ["Custom thumbnails", "Add chapters", "End screens", "Cards for engagement"]
+    },
+    "etsy": {
+      "focus": ["Product titles", "Tags (13)", "Attributes", "Shop announcement"],
+      "max_title_len": 140,
+      "max_desc_len": 5000,
+      "keywords_location": ["titles", "tags", "attributes", "shop policies"],
+      "best_practices": ["Use all 13 tags", "Long-tail keywords", "High-quality photos (10)", "Free shipping"]
+    },
+    "tiktok": {
+      "focus": ["Bio", "Video captions", "Hashtags", "Trending sounds"],
+      "max_title_len": 80,
+      "max_desc_len": 2200,
+      "keywords_location": ["bio", "captions", "hashtags", "sounds"],
+      "best_practices": ["Post 3-5x/day", "Use trending sounds", "Hook in first 3 seconds", "Engage with comments"]
+    },
+    "linkedin": {
+      "focus": ["Headline", "About section", "Experience", "Skills", "Articles"],
+      "max_title_len": 220,
+      "max_desc_len": 2600,
+      "keywords_location": ["headline", "about", "experience", "posts"],
+      "best_practices": ["Professional photo", "Custom URL", "Get endorsements", "Post articles weekly"]
+    }
+  },
+  
+  "technical_rules": {
+    "max_title_len": 60,
+    "max_desc_len": 160,
+    "min_h1": 1, "max_h1": 1,
+    "required_schema": ["Person", "Organization", "WebSite", "Product", "Article"],
+    "internal_link_target": 5,
+    "external_link_max": 3
+  }
+}
