@@ -8,7 +8,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Safely load module despite hyphen in folder name
 module_path = os.path.join(os.path.dirname(__file__), ".agent", "skills", "custom-seo", "scripts", "seo_core.py")
+if not os.path.isfile(module_path):
+    raise FileNotFoundError(f"SEO core module not found: {module_path}")
+
 spec = importlib.util.spec_from_file_location("seo_core", module_path)
+if spec is None or spec.loader is None:
+    raise ImportError(f"Cannot load seo_core module from path: {module_path}")
+
 seo_core = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(seo_core)
 
