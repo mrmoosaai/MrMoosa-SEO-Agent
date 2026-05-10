@@ -64,6 +64,22 @@ if st.button("🚀 Analyze Now", type="primary"):
                 st.markdown(f"*Fix: {fix}*")
             
             st.success("✅ Audit Complete!")
+                        # --- PDF DOWNLOAD BUTTON CODE START ---
+            import os
+            
+            # Check if PDF file exists (created by seo_core.py)
+            if os.path.exists("seo_audit_report.pdf"):
+                with open("seo_audit_report.pdf", "rb") as pdf_file:
+                    PDFBytes = pdf_file.read()
+                    
+                    st.download_button(
+                        label="📥 Download Professional PDF Report",
+                        data=PDFBytes,
+                        file_name="MrMoosa_SEO_Report.pdf",
+                        mime="application/pdf",
+                        type="primary"
+                    )
+            # --- PDF DOWNLOAD BUTTON CODE END ---
             
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
