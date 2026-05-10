@@ -77,7 +77,8 @@ if st.button("🚀 Analyze Now", type="primary"):
                     pdf_bytes = generate_pdf_report(result)
                 except Exception as e:
                     st.warning("⚠️ PDF report generation failed. Please check dependencies or retry.")
-                    st.debug(str(e)) if hasattr(st, 'debug') else None
+                    if hasattr(st, 'debug'):
+                        st.debug(str(e))
 
                 if pdf_bytes:
                     st.download_button(
@@ -87,6 +88,8 @@ if st.button("🚀 Analyze Now", type="primary"):
                         mime="application/pdf",
                         key="pdf_report_download"
                     )
+                else:
+                    st.warning("⚠️ PDF report could not be generated. Make sure reportlab is installed and the app can create the file in memory.")
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
             st.info("💡 Tip: Make sure the URL starts with http:// or https://")
