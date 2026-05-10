@@ -71,3 +71,16 @@ python .agent/skills/custom-seo/scripts/seo_core.py <URL> --pdf
 ## 🧠 AI Commands:
 - `@smart <URL>` → AI-powered priority fixes + platform tips
 - Agent automatically uses the `ai_recommendations` section in the chat report
+## 🔥 COMPETITOR ANALYSIS COMMANDS:
+
+Jab user bole:
+- "Mere competitors ko analyze karo"
+- "Is site ko compare karo competitors se"
+- "Competitor analysis karo"
+- "Mere se behtar kaun hai?"
+
+Toh automatically:
+1. Run: python .agent/skills/custom-seo/scripts/competitor_analyzer.py <URL> 3
+2. Comparison table dikhao
+3. Gap analysis batao
+4. Actionable recommendations do
