@@ -2,6 +2,7 @@ import streamlit as st
 import sys
 import os
 import importlib.util
+from datetime import datetime
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,7 @@ spec.loader.exec_module(seo_core)
 
 # Assign function to a variable for easy use
 analyze_single_url = seo_core.analyze_single_url
+generate_pdf_report = seo_core.generate_pdf_report
 
 # ──────────────────────────────────────────
 # STREAMLIT UI CODE STARTS HERE
@@ -40,47 +42,51 @@ if st.button("🚀 Analyze Now", type="primary"):
     with st.spinner("Auditing your website... This may take 1-2 minutes."):
         try:
             result = analyze_single_url(url)
-            
-            # Display Score
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Overall Score", f"{result.get('ai_recommendations', {}).get('overall_score', 'N/A')}/100")
-            col2.metric("Mobile", f"{result.get('mobile_friendly', {}).get('score', 'N/A')}/100")
-            col3.metric("Speed", f"{result.get('page_speed', {}).get('performance_score', 'N/A')}/100")
-            
-            # Show Recommendations
-            st.subheader("🤖 AI Recommendations")
-            for rec in result.get('ai_recommendations', {}).get('recommendations', []):
-                priority = rec.get('priority', '')
-                issue = rec.get('issue', '')
-                fix = rec.get('fix', '')
-                
-                if 'HIGH' in priority:
-                    st.error(f"**{priority}** - {issue}")
-                elif 'MEDIUM' in priority:
-                    st.warning(f"**{priority}** - {issue}")
-                else:
-                    st.info(f"**{priority}** - {issue}")
-                
-                st.markdown(f"*Fix: {fix}*")
-            
-            st.success("✅ Audit Complete!")
-                        # --- PDF DOWNLOAD BUTTON CODE START ---
-            import os
-            
-            # Check if PDF file exists (created by seo_core.py)
-            if os.path.exists("seo_audit_report.pdf"):
-                with open("seo_audit_report.pdf", "rb") as pdf_file:
-                    PDFBytes = pdf_file.read()
-                    
+
+            if result.get('error'):
+                st.error(f"❌ Analysis failed: {result.get('error')}")
+                st.info("💡 Tip: Make sure the URL starts with http:// or https://")
+            else:
+                # Display Score
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Overall Score", f"{result.get('ai_recommendations', {}).get('overall_score', 'N/A')}/100")
+                col2.metric("Mobile", f"{result.get('mobile_friendly', {}).get('score', 'N/A')}/100")
+                col3.metric("Speed", f"{result.get('page_speed', {}).get('performance_score', 'N/A')}/100")
+
+                # Show Recommendations
+                st.subheader("🤖 AI Recommendations")
+                for rec in result.get('ai_recommendations', {}).get('recommendations', []):
+                    priority = rec.get('priority', '')
+                    issue = rec.get('issue', '')
+                    fix = rec.get('fix', '')
+
+                    if 'HIGH' in priority:
+                        st.error(f"**{priority}** - {issue}")
+                    elif 'MEDIUM' in priority:
+                        st.warning(f"**{priority}** - {issue}")
+                    else:
+                        st.info(f"**{priority}** - {issue}")
+
+                    st.markdown(f"*Fix: {fix}*")
+
+                st.success("✅ Audit Complete!")
+
+                # Generate PDF in memory and show download button
+                pdf_bytes = None
+                try:
+                    pdf_bytes = generate_pdf_report(result)
+                except Exception as e:
+                    st.warning("⚠️ PDF report generation failed. Please check dependencies or retry.")
+                    st.debug(str(e)) if hasattr(st, 'debug') else None
+
+                if pdf_bytes:
                     st.download_button(
                         label="📥 Download Professional PDF Report",
-                        data=PDFBytes,
-                        file_name="MrMoosa_SEO_Report.pdf",
+                        data=pdf_bytes,
+                        file_name=f"MrMoosa_SEO_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                         mime="application/pdf",
-                        type="primary"
+                        key="pdf_report_download"
                     )
-            # --- PDF DOWNLOAD BUTTON CODE END ---
-            
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
             st.info("💡 Tip: Make sure the URL starts with http:// or https://")

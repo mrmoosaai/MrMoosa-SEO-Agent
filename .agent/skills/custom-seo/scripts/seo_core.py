@@ -421,36 +421,18 @@ def generate_pdf_report(data, output_file=None):
     try:
         from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Preformatted
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import cm
         from reportlab.lib.enums import TA_CENTER, TA_LEFT
-        import tkinter as tk
-        from tkinter import filedialog
-        
-        # Save Dialog
-        if output_file is None:
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes('-topmost', True)
-            output_file = filedialog.asksaveasfilename(
-                defaultextension=".pdf",
-                filetypes=[("PDF files", "*.pdf"), ("All files", "*.*")],
-                initialfile=f"SEO_Audit_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                title="Save SEO Report As..."
-            )
-            root.destroy()
-            if not output_file:
-                print("\n❌ Save cancelled by user.")
-                return False
-        
-        # PDF Setup - A4 with professional margins
-        doc = SimpleDocTemplate(output_file, pagesize=A4,
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4,
                                rightMargin=1.5*cm, leftMargin=1.5*cm,
                                topMargin=1.5*cm, bottomMargin=1.5*cm)
         elements = []
         styles = getSampleStyleSheet()
-        
+
         # Custom Professional Styles
         title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'],
             fontSize=22, textColor=colors.HexColor('#1a237e'), spaceAfter=15,
@@ -460,18 +442,19 @@ def generate_pdf_report(data, output_file=None):
             spaceBefore=12, fontName='Helvetica-Bold')
         normal_style = ParagraphStyle('CustomNormal', parent=styles['Normal'],
             fontSize=9, textColor=colors.black, fontName='Helvetica', leading=11)
-        
+
         # Header with branding
         elements.append(Paragraph("🔍 SEO AUDIT REPORT", title_style))
         elements.append(Spacer(1, 0.2*cm))
-        
+
         # URL & Date (with truncation)
         url_text = data.get('url', 'N/A')
-        if len(url_text) > 60: url_text = url_text[:57] + "..."
+        if len(url_text) > 60:
+            url_text = url_text[:57] + "..."
         elements.append(Paragraph(f"<b>URL:</b> {url_text}", normal_style))
         elements.append(Paragraph(f"<b>Date:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}", normal_style))
         elements.append(Spacer(1, 0.4*cm))
-        
+
         # Overall Score Box (Eye-catching)
         overall_score = calculate_overall_score(data)
         score_color = colors.green if overall_score >= 80 else colors.orange if overall_score >= 60 else colors.red
@@ -488,11 +471,10 @@ def generate_pdf_report(data, output_file=None):
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('BOX', (0, 0), (-1, -1), 2.5, colors.HexColor('#1a237e')),
             ('PADDING', (0, 0), (-1, -1), 16),
-            ('ROUNDEDCORNERS', [5, 5, 5, 5]),
         ]))
         elements.append(score_box)
         elements.append(Spacer(1, 0.5*cm))
-        
+
         # Key Metrics Table
         elements.append(Paragraph("📊 KEY METRICS", heading_style))
         mobile = data.get('mobile_friendly', {}).get('score', 0)
@@ -516,14 +498,16 @@ def generate_pdf_report(data, output_file=None):
         ]))
         elements.append(metrics_table)
         elements.append(Spacer(1, 0.5*cm))
-        
+
         # Technical Details (Clean, no HTML tags)
         elements.append(Paragraph("🔧 TECHNICAL DETAILS", heading_style))
         title = data.get('title', 'N/A') or "Not detected"
         meta = data.get('meta_desc', '') or "Missing"
-        if len(title) > 45: title = title[:42] + "..."
-        if len(meta) > 45: meta = meta[:42] + "..."
-        
+        if len(title) > 45:
+            title = title[:42] + "..."
+        if len(meta) > 45:
+            meta = meta[:42] + "..."
+
         tech_data = [
             ['Title', title],
             ['Meta Description', meta],
@@ -545,7 +529,7 @@ def generate_pdf_report(data, output_file=None):
         ]))
         elements.append(tech_table)
         elements.append(Spacer(1, 0.5*cm))
-        
+
         # AI Recommendations Table
         ai_data = data.get("ai_recommendations", {})
         if ai_data and ai_data.get("recommendations"):
@@ -554,7 +538,8 @@ def generate_pdf_report(data, output_file=None):
             rec_data = [['Priority', 'Issue', 'Impact']]
             for r in recs[:5]:
                 issue = r.get("issue", "")
-                if len(issue) > 28: issue = issue[:25] + "..."
+                if len(issue) > 28:
+                    issue = issue[:25] + "..."
                 rec_data.append([r.get("priority", ""), issue, r.get("impact", "")[:25]])
             rec_table = Table(rec_data, colWidths=[2.5*cm, 8.5*cm, 6*cm])
             rec_table.setStyle(TableStyle([
@@ -569,7 +554,7 @@ def generate_pdf_report(data, output_file=None):
             ]))
             elements.append(rec_table)
             elements.append(Spacer(1, 0.5*cm))
-        
+
         # Quick Fixes Section (Copy-Paste Ready Code)
         auto_fixes = data.get("auto_fixes", [])
         if auto_fixes:
@@ -577,21 +562,14 @@ def generate_pdf_report(data, output_file=None):
             for i, fix in enumerate(auto_fixes[:3], 1):
                 elements.append(Paragraph(f"<b>#{i}. {fix['issue']}</b>", normal_style))
                 elements.append(Paragraph(f"📍 Location: {fix['location']}", normal_style))
-                
-                # ✅ FIXED: Use raw code (NO HTML escape) + proper wrapping in Table
                 code = fix['code']
-                
-                # Split long lines to prevent word-breaking
                 code_lines = code.split('\n')
                 code_display = '\n'.join(code_lines)
-                
-                # Use Table for better wrapping and alignment
                 code_style = ParagraphStyle('CodeStyle', parent=styles['Code'],
-                    fontSize=8, textColor=colors.HexColor('#1a237e'), 
+                    fontSize=8, textColor=colors.HexColor('#1a237e'),
                     backColor=colors.HexColor('#f5f5f5'),
                     fontName='Courier', leading=10,
                     leftIndent=5, rightIndent=5)
-                
                 code_para = Paragraph(f"<tt>{html_module.escape(code_display)}</tt>", code_style)
                 code_table = Table([[code_para]], colWidths=[16*cm])
                 code_table.setStyle(TableStyle([
@@ -603,27 +581,31 @@ def generate_pdf_report(data, output_file=None):
                 ]))
                 elements.append(code_table)
                 elements.append(Spacer(1, 0.3*cm))
-        
+
         # Footer
         elements.append(Spacer(1, 0.5*cm))
         footer_style = ParagraphStyle('Footer', parent=styles['Normal'],
             fontSize=8, textColor=colors.grey, alignment=TA_CENTER, fontName='Helvetica-Oblique')
         elements.append(Paragraph("Generated by Mr Moosa AI SEO Agent • 100% Free & Open Source", footer_style))
-        
+
         # Build PDF
         doc.build(elements)
-        print(f"\n✅ PDF Report saved to: {output_file}")
-        return True
-        
+        pdf_bytes = buffer.getvalue()
+        if output_file:
+            with open(output_file, 'wb') as f:
+                f.write(pdf_bytes)
+            print(f"\n✅ PDF Report saved to: {output_file}")
+        return pdf_bytes
+
     except ImportError as e:
         print(f"\n⚠️  Error: {e}")
         print("Please install reportlab: pip install reportlab")
-        return False
+        return None
     except Exception as e:
         print(f"\n❌ PDF generation error: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        return None
 
 # ==========================================
 # 7. BULK AUDITOR (Stealth Enhanced)
