@@ -1,5 +1,7 @@
 streamlit
-requests
+google-generativeai
 beautifulsoup4
-pandas
+brotli
 reportlab
+requests
+lxml

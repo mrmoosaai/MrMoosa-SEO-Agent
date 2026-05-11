@@ -2,7 +2,6 @@ import os
 import sys
 import streamlit as st
 
-# Add the SEO core script directory to the import path so Hugging Face can load it.
 SCRIPT_DIR = os.path.join(os.path.dirname(__file__), ".agent", "skills", "custom-seo", "scripts")
 if SCRIPT_DIR not in sys.path:
     sys.path.append(SCRIPT_DIR)
